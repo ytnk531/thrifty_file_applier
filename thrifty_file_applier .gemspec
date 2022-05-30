@@ -9,7 +9,7 @@ Gem::Specification.new do |spec|
   spec.email = ["ytnk531@gmail.com"]
 
   spec.summary = "Applies files if needed."
-  spec.homepage = "https://github.com/ytnk531/thrifty_file_appiler"
+  spec.homepage = "https://github.com/ytnk531/thrifty_file_applier"
   spec.license = "MIT"
   spec.required_ruby_version = ">= 2.6.0"
 

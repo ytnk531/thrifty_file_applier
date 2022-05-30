@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    thrifty_file_applier (0.1.0)
+    thrifty_file_applier (0.1.2)
 
 GEM
   remote: https://rubygems.org/
