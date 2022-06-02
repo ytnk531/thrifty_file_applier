@@ -19,4 +19,23 @@ RSpec.describe ThriftyFileApplier::Applier do
     expect(applier.apply).to eq "compile"
     expect(applier.apply).to eq nil
   end
+
+  it "processes array source_path" do
+    applier = ThriftyFileApplier::Applier.new(
+      'tmp/timestamp',
+      'tmp/source/file1',
+                'tmp/source/file2'
+    ) do
+      "compile"
+    end
+
+    rm_f 'tmp/timestamp'
+
+    touch('tmp/source/file1')
+    expect(applier.apply).to eq "compile"
+    expect(applier.apply).to eq nil
+    touch('tmp/source/file2')
+    expect(applier.apply).to eq "compile"
+    expect(applier.apply).to eq nil
+  end
 end

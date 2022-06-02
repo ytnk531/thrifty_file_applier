@@ -13,9 +13,9 @@ module ThriftyFileApplier
 
   # Actual applier class.
   class Applier
-    def initialize(last_execution_log_path, source_path, &executor)
+    def initialize(last_execution_log_path, *source_paths, &executor)
       @last_execution_log_path = Pathname.new last_execution_log_path
-      @update_source_path = Pathname.new source_path
+      @update_source_paths = source_paths.map { Pathname.new _1 }
       @executor = executor
     end
 
@@ -40,10 +40,16 @@ module ThriftyFileApplier
     end
 
     def last_update_time
-      if @update_source_path.directory? && @update_source_path.children.size.positive?
+      @update_source_paths.map { last_update_time_in _1 }.max
+    end
+
+    def last_update_time_in(path)
+      return Time.at 0 unless path.exist?
+
+      if path.directory? && path.children.size.positive?
         newest_mtime path
       else
-        @update_source_path.mtime
+        path.mtime
       end
     end
 
