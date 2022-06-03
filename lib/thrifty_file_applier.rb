@@ -24,22 +24,25 @@ module ThriftyFileApplier
     end
 
     def apply
-      exec_if_needed(&@executor)
+      exec_if_updated(&@executor)
     end
 
-    def exec_if_needed(&block)
-      return if last_execution_time >= last_update_time
-
-      log_execution(&block)
+    def exec_if_updated(&block)
+      if last_update_time > last_execution_time
+        exec_with_log(&block)
+      end
     end
 
     private
 
-    def log_execution
+    def exec_with_log
       execution_time = Time.now.to_f
+
       result = yield
+
       FileUtils.mkdir_p(@last_execution_log_path.dirname)
       @last_execution_log_path.open("wb") { |f| f.write(execution_time) }
+
       result
     end
 
