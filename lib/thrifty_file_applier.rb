@@ -7,8 +7,12 @@ require "fileutils"
 module ThriftyFileApplier
   class Error < StandardError; end
 
-  def self.applier(last_execution_log_path, source_path, &executor)
-    Applier.new(last_execution_log_path, source_path, &executor)
+  def self.applier(last_execution_log_path, *source_paths, &executor)
+    Applier.new(last_execution_log_path, *source_paths, &executor)
+  end
+
+  def self.apply(last_execution_log_path, *source_paths, &executor)
+    applier(last_execution_log_path, *source_paths, &executor).apply
   end
 
   # Actual applier class.
