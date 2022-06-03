@@ -50,11 +50,7 @@ module ThriftyFileApplier
     def last_update_time_in(path)
       return Time.at 0 unless path.exist?
 
-      if path.directory? && path.children.size.positive?
-        newest_mtime path
-      else
-        path.mtime
-      end
+      newest_mtime path
     end
 
     def last_execution_time
@@ -67,8 +63,11 @@ module ThriftyFileApplier
     end
 
     def newest_mtime(path)
-      path.each_child
-          .map { File.mtime(_1) }
+      return path.mtime if !path.directory? ||
+                    (path.directory? && path.children.size.zero?)
+
+      path.children
+          .map { newest_mtime(_1) }
           .max
     end
   end

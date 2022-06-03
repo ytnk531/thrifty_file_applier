@@ -38,4 +38,24 @@ RSpec.describe ThriftyFileApplier::Applier do
     expect(applier.apply).to eq "compile"
     expect(applier.apply).to eq nil
   end
+
+  it "searches files recursively" do
+    applier = ThriftyFileApplier::Applier.new(
+      'tmp/timestamp',
+      'tmp/source/'
+    ) do
+      "compile"
+    end
+
+    mkdir_p 'tmp/source/p1/p2/p3'
+    mkdir_p 'tmp/source/p1/p2/p4'
+
+    touch('tmp/source/p1/p2/file1')
+    expect(applier.apply).to eq "compile"
+    touch('tmp/source/p1/p2/p3/file1')
+    expect(applier.apply).to eq "compile"
+    touch('tmp/source/p1/p2/p4/file1')
+    expect(applier.apply).to eq "compile"
+    expect(applier.apply).to eq nil
+  end
 end
