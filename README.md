@@ -29,7 +29,7 @@ applier.apply # => compile
 applier.apply # => nil
 FileUtils.touch "source/file"
 applier.apply # => compile
-FileUtils.rm "source/file"
+FileUtils.rm "tmp/last_application_time"
 applier.apply # => compile
 ```
 
