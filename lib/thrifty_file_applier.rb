@@ -28,37 +28,27 @@ module ThriftyFileApplier
     end
 
     def exec_if_updated(&block)
-      t = source_update_time
-      exec_with_log(t, &block) if t > last_applied_mtime
+      update_time_f = source_update_time.to_f
+      exec_with_log(update_time_f, &block) if update_time_f > last_applied_time_f
     end
 
     private
 
-    def exec_with_log(time)
+    def exec_with_log(time_f)
       result = yield
 
       FileUtils.mkdir_p(@last_applied_log_path.dirname)
-      @last_applied_log_path.open("wb") { |f| f.write(time.to_f) }
+      @last_applied_log_path.open("wb") { |f| f.write(time_f) }
 
       result
     end
 
     def source_update_time
-      @source_paths.map { last_update_time_in _1 }.max.to_f
-    end
+      @source_paths.map do |path|
+        return Time.at 0 unless path.exist?
 
-    def last_update_time_in(path)
-      return Time.at 0 unless path.exist?
-
-      newest_mtime path
-    end
-
-    def last_applied_mtime
-      if @last_applied_log_path.exist?
-        @last_applied_log_path.read.to_f
-      else
-        0.0
-      end
+        newest_mtime path
+      end.max
     end
 
     def newest_mtime(path)
@@ -68,6 +58,14 @@ module ThriftyFileApplier
       path.children
           .map { newest_mtime(_1) }
           .max
+    end
+
+    def last_applied_time_f
+      if @last_applied_log_path.exist?
+        @last_applied_log_path.read.to_f
+      else
+        0.0
+      end
     end
   end
 end
