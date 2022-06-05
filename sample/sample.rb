@@ -16,6 +16,6 @@ applier.apply # => compile
 FileUtils.rm "tmp/last_application_time"
 ThriftyFileApplier.apply("tmp/last_application_time", "source") do
   puts "compile"
-end # => "compile"
+end
 
 FileUtils.rm "source/file"
