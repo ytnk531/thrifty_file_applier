@@ -14,8 +14,8 @@ RSpec.describe ThriftyFileApplier::Applier do
       "compile"
     end
 
-    touch("#{source_path}file")
     rm_f(log_path)
+    touch("#{source_path}file")
     expect(applier.apply).to eq "compile"
     expect(applier.apply).to eq nil
   end
@@ -31,11 +31,11 @@ RSpec.describe ThriftyFileApplier::Applier do
 
     rm_f "tmp/timestamp"
 
-    sleep 0.1
     touch("tmp/source/file1")
     expect(applier.apply).to eq "compile"
     expect(applier.apply).to eq nil
-    sleep 0.1
+
+    wait
     touch("tmp/source/file2")
     expect(applier.apply).to eq "compile"
     expect(applier.apply).to eq nil
@@ -51,16 +51,24 @@ RSpec.describe ThriftyFileApplier::Applier do
 
     mkdir_p "tmp/source/p1/p2/p3"
     mkdir_p "tmp/source/p1/p2/p4"
+    rm_f "tmp/timestamp"
 
-    sleep 0.01
     touch("tmp/source/p1/p2/file1")
     expect(applier.apply).to eq "compile"
-    sleep 0.01
+
+    wait
     touch("tmp/source/p1/p2/p3/file2")
     expect(applier.apply).to eq "compile"
-    sleep 0.01
+
+    wait
     touch("tmp/source/p1/p2/p4/file3")
     expect(applier.apply).to eq "compile"
     expect(applier.apply).to eq nil
+  end
+
+  def wait
+    # This waiting time is needed to update mtime.
+    # In CI environment, mtime is not updated in short time.
+    sleep 0.01
   end
 end
