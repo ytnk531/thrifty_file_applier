@@ -18,8 +18,8 @@ module ThriftyFileApplier
   # Actual applier class.
   class Applier
     def initialize(last_execution_log_path, *source_paths, &executor)
-      @last_execution_log_path = Pathname.new last_execution_log_path
-      @update_source_paths = source_paths.map { Pathname.new _1 }
+      @last_applied_log_path = Pathname.new last_execution_log_path
+      @source_paths = source_paths.map { Pathname.new _1 }
       @executor = executor
     end
 
@@ -28,8 +28,8 @@ module ThriftyFileApplier
     end
 
     def exec_if_updated(&block)
-      update_time = last_update_time
-      exec_with_log(update_time, &block) if last_update_time > last_execution_time
+      t = source_update_time
+      exec_with_log(t, &block) if t > last_applied_mtime
     end
 
     private
@@ -37,14 +37,14 @@ module ThriftyFileApplier
     def exec_with_log(time)
       result = yield
 
-      FileUtils.mkdir_p(@last_execution_log_path.dirname)
-      @last_execution_log_path.open("wb") { |f| f.write(time.to_f) }
+      FileUtils.mkdir_p(@last_applied_log_path.dirname)
+      @last_applied_log_path.open("wb") { |f| f.write(time.to_f) }
 
       result
     end
 
-    def last_update_time
-      @update_source_paths.map { last_update_time_in _1 }.max.to_f
+    def source_update_time
+      @source_paths.map { last_update_time_in _1 }.max.to_f
     end
 
     def last_update_time_in(path)
@@ -53,9 +53,9 @@ module ThriftyFileApplier
       newest_mtime path
     end
 
-    def last_execution_time
-      if @last_execution_log_path.exist?
-        @last_execution_log_path.read.to_f
+    def last_applied_mtime
+      if @last_applied_log_path.exist?
+        @last_applied_log_path.read.to_f
       else
         0.0
       end
