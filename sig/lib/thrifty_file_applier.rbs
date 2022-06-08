@@ -1,0 +1,28 @@
+# Executes specified block only if source file had been updated.
+module ThriftyFileApplier
+  class Error < StandardError
+  end
+
+  def self.applier: [T] (String applied_time_path, *String source_paths) { () -> T } -> T
+
+  def self.apply: [T] (String applied_time_path, *String source_paths) { () -> T } -> T
+
+  # Actual applier class.
+  class Applier[T]
+    def initialize: (String applied_time_path, *String source_paths) { () -> T } -> void
+
+    def apply: () -> T
+
+    def exec_if_updated: [U] () { () -> U } -> U
+
+    private
+
+    def exec_with_log: [U] (Float time_f) { () -> U } -> U
+
+    def source_update_time: () -> Time
+
+    def newest_mtime: (Pathname path) -> Time
+
+    def last_applied_time_f: () -> Float
+  end
+end
