@@ -7,18 +7,18 @@ require "fileutils"
 module ThriftyFileApplier
   class Error < StandardError; end
 
-  def self.applier(last_execution_log_path, *source_paths, &executor)
-    Applier.new(last_execution_log_path, *source_paths, &executor)
+  def self.applier(applied_time_path, *source_paths, &executor)
+    Applier.new(applied_time_path, *source_paths, &executor)
   end
 
-  def self.apply(last_execution_log_path, *source_paths, &executor)
-    applier(last_execution_log_path, *source_paths, &executor).apply
+  def self.apply(applied_time_path, *source_paths, &executor)
+    applier(applied_time_path, *source_paths, &executor).apply
   end
 
   # Actual applier class.
   class Applier
-    def initialize(last_execution_log_path, *source_paths, &executor)
-      @last_applied_log_path = Pathname.new last_execution_log_path
+    def initialize(applied_time_path, *source_paths, &executor)
+      @last_applied_log_path = Pathname.new applied_time_path
       @source_paths = source_paths.map { Pathname.new _1 }
       @executor = executor
     end
@@ -45,9 +45,7 @@ module ThriftyFileApplier
 
     def source_update_time
       @source_paths.map do |path|
-        return Time.at 0 unless path.exist?
-
-        newest_mtime path
+        path.exist? ? newest_mtime(path) : Time.at(0)
       end.max
     end
 
