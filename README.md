@@ -46,7 +46,7 @@ If reusing applier was not needed, shorthands are available.
 ```ruby
 ThriftyFileApplier.apply("tmp/last_application_time", "source") do
   puts "compile"
-end # => "compile"
+end # => compile
 ```
 
 ## Development
